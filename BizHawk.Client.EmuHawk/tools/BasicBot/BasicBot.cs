@@ -25,7 +25,7 @@ namespace BizHawk.Client.EmuHawk
 		private string _lastRom = "";
 		private bool _dontUpdateValues = false;
 		private MemoryDomain _currentDomain;
-		private bool _bigEndian;
+		private bool _isBigEndian;
 		private int _dataSize;
 
 		private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
@@ -66,7 +66,8 @@ namespace BizHawk.Client.EmuHawk
 		#endregion
 
 		#region Network
-		private byte[] _buffer = new byte[1024];
+		private byte[] _buffer = new byte[1];
+		private int _bufferSize = 0;
 
 		private void ConnectServer()
 		{
@@ -80,7 +81,12 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ReceiveFromServer()
 		{
-			_socket.Receive(_buffer);
+			_bufferSize = _socket.Receive(_buffer);
+		}
+
+		private void PrintBuffer()
+		{
+			Console.WriteLine(Encoding.UTF8.GetString(_buffer, 0, _bufferSize));
 		}
 
 		private void DisconnectServer()
@@ -95,11 +101,14 @@ namespace BizHawk.Client.EmuHawk
 		{
 			get
 			{
-				char num = StartFromSlotBox.SelectedItem
-					.ToString()
-					.Last();
-
-				return "QuickSave" + num;
+				if (StartFromSlotBox.SelectedItem == null)
+				{
+					return "QuickSave0";
+				}
+				else
+				{
+					return "QuickSave" + StartFromSlotBox.SelectedItem.ToString().Last();
+				}
 			}
 		}
 
@@ -164,7 +173,34 @@ namespace BizHawk.Client.EmuHawk
 
 		private void Update(bool fast)
 		{
-			;
+			if(_isBotting)
+			{
+				if (_Emulator.Frame >= _frames)
+				{
+					_frames += 60;
+
+					this.ReadMemory();
+
+					this.SendToServer();
+					this.ReceiveFromServer();
+					this.PrintBuffer();
+				}
+
+				this.PressButtons();
+			}
+		}
+
+		private void ReadMemory()
+		{
+			Array.Clear(_buffer, 0, _bufferSize);
+
+			string msg = string.Empty;
+
+			msg += _currentDomain.PeekUshort(0x000CB4, _isBigEndian);
+			msg += ".";
+			msg += _currentDomain.PeekUshort(0x000CB6, _isBigEndian);
+
+			_buffer = Encoding.UTF8.GetBytes(msg);
 		}
 
 		private void PressButtons()
@@ -178,7 +214,7 @@ namespace BizHawk.Client.EmuHawk
 				_MemoryDomains.Contains(_currentDomain))
 			{
 				_currentDomain = _MemoryDomains.MainMemory;
-				_bigEndian = _currentDomain.EndianType == MemoryDomain.Endian.Big;
+				_isBigEndian = _currentDomain.EndianType == MemoryDomain.Endian.Big;
 				_dataSize = 1;
 			}
 
@@ -214,7 +250,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void BigEndianMenuItem_Click(object sender, EventArgs e)
 		{
-			_bigEndian ^= true;
+			_isBigEndian ^= true;
 		}
 
 		private void DataSizeMenuItem_DropDownOpened(object sender, EventArgs e)
@@ -261,7 +297,7 @@ namespace BizHawk.Client.EmuHawk
 		private void SetMemoryDomain(string name)
 		{
 			_currentDomain = _MemoryDomains[name];
-			_bigEndian = _MemoryDomains[name].EndianType == MemoryDomain.Endian.Big;
+			_isBigEndian = _MemoryDomains[name].EndianType == MemoryDomain.Endian.Big;
 		}
 
 		private int GetRamvalue(int addr)
@@ -274,10 +310,10 @@ namespace BizHawk.Client.EmuHawk
 					val = _currentDomain.PeekByte(addr);
 					break;
 				case 2:
-					val = _currentDomain.PeekUshort(addr, _bigEndian);
+					val = _currentDomain.PeekUshort(addr, _isBigEndian);
 					break;
 				case 4:
-					val = (int)_currentDomain.PeekUint(addr, _bigEndian);
+					val = (int)_currentDomain.PeekUint(addr, _isBigEndian);
 					break;
 			}
 
@@ -304,7 +340,7 @@ namespace BizHawk.Client.EmuHawk
 			}
 
 			_dontUpdateValues = true;
-			GlobalWin.MainForm.LoadQuickSave(SelectedSlot, false, true); // Triggers an UpdateValues call
+			GlobalWin.MainForm.LoadQuickSave(SelectedSlot, false, true);
 			_dontUpdateValues = false;
 
 			_targetFrame = _Emulator.Frame + 0;
