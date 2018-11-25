@@ -4,9 +4,10 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
-using BizHawk.Client.EmuHawk.ToolExtensions;
 
+using BizHawk.Client.EmuHawk.ToolExtensions;
 using BizHawk.Emulation.Common;
 using BizHawk.Client.Common;
 
@@ -23,13 +24,9 @@ namespace BizHawk.Client.EmuHawk
 		private int _targetFrame = 0;
 		private bool _oldCountingSetting = false;
 		private string _lastRom = "";
-		private bool _dontUpdateValues = false;
 		private MemoryDomain _currentDomain;
 		private bool _isBigEndian;
 		private int _dataSize;
-
-		private Socket _socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-		private IPEndPoint _endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7000);
 
 		#region Services and Settings
 
@@ -49,13 +46,6 @@ namespace BizHawk.Client.EmuHawk
 		{
 			this.InitializeComponent();
 			this.Text = DialogTitle;
-
-			this.ConnectServer();
-		}
-
-		~BasicBot()
-		{
-			this.DisconnectServer();
 		}
 
 		private void BasicBot_Load(object sender, EventArgs e)
@@ -66,12 +56,123 @@ namespace BizHawk.Client.EmuHawk
 		#endregion
 
 		#region Network
+		private Socket _socket;
+		private IPEndPoint _endPoint;
 		private byte[] _buffer = new byte[1];
 		private int _bufferSize = 0;
+		private int _keyMove = 0;
+		private int _keyControl = 0;
+		private string[] _mapMove = { string.Empty, "P1 Left", "P1 Up", "P1 Right", "P1 Down" };
+		private string[] _mapControl = { string.Empty, "P1 X", "P1 Y", "P1 A", "P1 B" };
+
+		private int _p1_X = -1;
+		private int _p1_Y = -1;
+		private int _p1_HP = -1;
+		private int _p1_isAttacking = 0;
+		private int _p1_wasHitting = 0;
+		private int _p1_isHitting = 0;
+		private int _p1_cannotControl = 0;
+
+		private int _p2_X = -1;
+		private int _p2_Y = -1;
+		private int _p2_HP = -1;
+
+		private int _timer = 0;
+		private int _winner = 0;
+		private int _roundState = 0;
 
 		private void ConnectServer()
 		{
+			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			_endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7000);
 			_socket.Connect(_endPoint);
+		}
+
+		private void ReadFeature()
+		{
+			_p1_X = _currentDomain.PeekUshort(0x000022, _isBigEndian);
+			_p1_Y = 192 - _currentDomain.PeekUshort(0x000C0A, _isBigEndian);
+			_p1_HP = _currentDomain.PeekUshort(0x000D12, _isBigEndian);
+			if (_currentDomain.PeekUshort(0x000CB2, _isBigEndian) >= 256)
+			{
+				_p1_isAttacking = 1;
+			}
+			else
+			{
+				_p1_isAttacking = 0;
+			}
+			if((_p1_wasHitting == 1) && (_p1_Y > 0))
+			{
+				_p1_isHitting = 1;
+			}
+			else if(_currentDomain.PeekUshort(0x000C58, _isBigEndian) >= 256)
+			{
+				_p1_wasHitting = 1;
+				_p1_isHitting = 1;
+			}
+			else
+			{
+				_p1_wasHitting = 0;
+				_p1_isHitting = 0;
+			}
+			_p1_cannotControl = ((_p1_isAttacking + _p1_isHitting) > 0) ? 1 : 0;
+
+			_p2_X = _currentDomain.PeekUshort(0x000026, _isBigEndian);
+			_p2_Y = 192 - _currentDomain.PeekUshort(0x000E0A, _isBigEndian);
+			_p2_HP = _currentDomain.PeekUshort(0x000F12, _isBigEndian);
+
+			_timer = _currentDomain.PeekUshort(0x001AC8, _isBigEndian);
+			_winner = _currentDomain.PeekUshort(0x001ACE, _isBigEndian);
+			switch(_roundState)
+			{
+				// before round
+				case 0:
+					if (_timer == 152)
+					{
+						_roundState = 1;
+					}
+					else
+					{
+						_timer = 0;
+					}
+					break;
+
+				// in round
+				case 1:
+					if (_winner >= 256)
+					{
+						_roundState = 0;
+					}
+					break;
+			}
+		}
+
+		private void MakeBuffer()
+		{
+			Array.Clear(_buffer, 0, _bufferSize);
+
+			int p1_isLeft = (_p1_X > _p2_X) ? 1 : 0;
+			int gap_x = Math.Abs(_p1_X - _p2_X);
+			int gap_y = Math.Abs(_p1_Y - _p2_Y);
+			int gap_hp_for_p1 = _p1_HP - _p2_HP;
+			int p1_canInputMove = (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1);
+			int p1_canInputAction = (_p1_cannotControl > 0) ? 0 : 1;
+
+			string msg = string.Empty;
+
+			msg += p1_isLeft;
+			msg += ".";
+			msg += gap_x;
+			msg += ".";
+			msg += gap_y;
+			msg += ".";
+			msg += gap_hp_for_p1;
+			msg += ".";
+			msg += p1_canInputMove;
+			msg += ".";
+			msg += p1_canInputAction;
+
+			_buffer = Encoding.UTF8.GetBytes(msg);
 		}
 
 		private void SendToServer()
@@ -82,6 +183,9 @@ namespace BizHawk.Client.EmuHawk
 		private void ReceiveFromServer()
 		{
 			_bufferSize = _socket.Receive(_buffer);
+			string[] keys = Encoding.UTF8.GetString(_buffer, 0, _bufferSize).Split('.');
+			_keyMove = int.Parse(keys[0]);
+			_keyControl = int.Parse(keys[1]);
 		}
 
 		private void PrintBuffer()
@@ -175,37 +279,54 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if(_isBotting)
 			{
-				if (_Emulator.Frame >= _frames)
+				this.ReadFeature();
+
+				if(_timer == 0)
 				{
-					_frames += 60;
-
-					this.ReadMemory();
-
-					this.SendToServer();
-					this.ReceiveFromServer();
-					this.PrintBuffer();
+					if (_frames > 100)
+					{
+						Global.LuaAndAdaptor.SetButton("P1 Start", true);
+						_frames = 0;
+					}
+					else
+					{
+						Global.LuaAndAdaptor.SetButton("P1 Start", false);
+					}
+					++_frames;
 				}
+				else
+				{
+					if (_p1_cannotControl == 0)
+					{
+						GlobalWin.MainForm.PauseEmulator();
 
-				this.PressButtons();
+						this.MakeBuffer();
+						this.SendToServer();
+						this.ReceiveFromServer();
+						this.PrintBuffer();
+
+						GlobalWin.MainForm.UnpauseEmulator();
+					}
+					this.PressButtons();
+				}
 			}
 		}
 
-		private void ReadMemory()
+		private bool IsCanInput()
 		{
-			Array.Clear(_buffer, 0, _bufferSize);
-
-			string msg = string.Empty;
-
-			msg += _currentDomain.PeekUshort(0x000CB4, _isBigEndian);
-			msg += ".";
-			msg += _currentDomain.PeekUshort(0x000CB6, _isBigEndian);
-
-			_buffer = Encoding.UTF8.GetBytes(msg);
+			return true;
 		}
 
 		private void PressButtons()
 		{
-			;
+			if(_keyMove > 0)
+			{
+				Global.LuaAndAdaptor.SetButton(_mapMove[_keyMove], true);
+			}
+			if(_keyControl > 0)
+			{
+				Global.LuaAndAdaptor.SetButton(_mapControl[_keyControl], true);
+			}
 		}
 
 		public void Restart()
@@ -339,13 +460,13 @@ namespace BizHawk.Client.EmuHawk
 				Global.MovieSession.Movie.IsCountingRerecords = false;
 			}
 
-			_dontUpdateValues = true;
 			GlobalWin.MainForm.LoadQuickSave(SelectedSlot, false, true);
-			_dontUpdateValues = false;
 
 			_targetFrame = _Emulator.Frame + 0;
 
 			GlobalWin.MainForm.UnpauseEmulator();
+
+			this.ConnectServer();
 		}
 
 		private bool CanStart()
@@ -368,6 +489,8 @@ namespace BizHawk.Client.EmuHawk
 			}
 
 			GlobalWin.MainForm.PauseEmulator();
+
+			this.DisconnectServer();
 		}
 
 		private void SetMaxSpeed()
