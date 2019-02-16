@@ -301,8 +301,8 @@ namespace BizHawk.Client.EmuHawk
 						GlobalWin.MainForm.PauseEmulator();
 
 						this.MakeBuffer();
-						this.SendToServer();
 						this.ReceiveFromServer();
+						this.SendToServer();
 						this.PrintBuffer();
 
 						GlobalWin.MainForm.UnpauseEmulator();
