@@ -13,6 +13,7 @@ using BizHawk.Client.Common;
 
 using System.Net;
 using System.Net.Sockets;
+using Newtonsoft.Json;
 
 namespace BizHawk.Client.EmuHawk
 {
@@ -80,6 +81,16 @@ namespace BizHawk.Client.EmuHawk
 		private int _timer = 0;
 		private int _winner = 0;
 		private int _roundState = 0;
+
+		public class Data
+		{
+			public int p1_isLeft;
+			public int gap_x;
+			public int gap_y;
+			public int gap_hp_for_p1;
+			public int p1_canInputMove;
+			public int p1_canInputAction;
+		}
 
 		private void ConnectServer()
 		{
@@ -151,28 +162,18 @@ namespace BizHawk.Client.EmuHawk
 		{
 			Array.Clear(_buffer, 0, _bufferSize);
 
-			int p1_isLeft = (_p1_X > _p2_X) ? 1 : 0;
-			int gap_x = Math.Abs(_p1_X - _p2_X);
-			int gap_y = Math.Abs(_p1_Y - _p2_Y);
-			int gap_hp_for_p1 = _p1_HP - _p2_HP;
-			int p1_canInputMove = (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1);
-			int p1_canInputAction = (_p1_cannotControl > 0) ? 0 : 1;
+			Data d = new Data
+			{
+				p1_isLeft = (_p1_X > _p2_X) ? 1 : 0,
+				gap_x = Math.Abs(_p1_X - _p2_X),
+				gap_y = Math.Abs(_p1_Y - _p2_Y),
+				gap_hp_for_p1 = _p1_HP - _p2_HP,
+				p1_canInputMove = (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1),
+				p1_canInputAction = (_p1_cannotControl > 0) ? 0 : 1
+			};
 
-			string msg = string.Empty;
-
-			msg += p1_isLeft;
-			msg += ".";
-			msg += gap_x;
-			msg += ".";
-			msg += gap_y;
-			msg += ".";
-			msg += gap_hp_for_p1;
-			msg += ".";
-			msg += p1_canInputMove;
-			msg += ".";
-			msg += p1_canInputAction;
-
-			_buffer = Encoding.UTF8.GetBytes(msg);
+			string json = JsonConvert.SerializeObject(d);
+			_buffer = Encoding.UTF8.GetBytes(json);
 		}
 
 		private void SendToServer()
@@ -184,8 +185,30 @@ namespace BizHawk.Client.EmuHawk
 		{
 			_bufferSize = _socket.Receive(_buffer);
 			string[] keys = Encoding.UTF8.GetString(_buffer, 0, _bufferSize).Split('.');
-			_keyMove = int.Parse(keys[0]);
-			_keyControl = int.Parse(keys[1]);
+			
+			if(keys.Length > 0)
+			{
+				try
+				{
+					_keyMove = int.Parse(keys[0]);
+				}
+				catch
+				{
+					_keyMove = 0;
+				}
+			}
+
+			if(keys.Length > 1)
+			{
+				try
+				{
+					_keyControl = int.Parse(keys[1]);
+				}
+				catch
+				{
+					_keyControl = 0;
+				}
+			}
 		}
 
 		private void PrintBuffer()
@@ -281,34 +304,16 @@ namespace BizHawk.Client.EmuHawk
 			{
 				this.ReadFeature();
 
-				if(_timer == 0)
-				{
-					if (_frames > 100)
-					{
-						Global.LuaAndAdaptor.SetButton("P1 Start", true);
-						_frames = 0;
-					}
-					else
-					{
-						Global.LuaAndAdaptor.SetButton("P1 Start", false);
-					}
-					++_frames;
-				}
-				else
-				{
-					if (_p1_cannotControl == 0)
-					{
-						GlobalWin.MainForm.PauseEmulator();
+				GlobalWin.MainForm.PauseEmulator();
 
-						this.MakeBuffer();
-						this.ReceiveFromServer();
-						this.SendToServer();
-						this.PrintBuffer();
+				this.ReceiveFromServer();
+				this.MakeBuffer();
+				this.SendToServer();
+				this.PrintBuffer();
 
-						GlobalWin.MainForm.UnpauseEmulator();
-					}
-					this.PressButtons();
-				}
+				GlobalWin.MainForm.UnpauseEmulator();
+
+				this.PressButtons();
 			}
 		}
 
@@ -319,11 +324,11 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PressButtons()
 		{
-			if(_keyMove > 0)
+			if((_keyMove > 0) && (_keyMove < _mapMove.Length))
 			{
 				Global.LuaAndAdaptor.SetButton(_mapMove[_keyMove], true);
 			}
-			if(_keyControl > 0)
+			if((_keyControl > 0) && (_keyControl < _mapControl.Length))
 			{
 				Global.LuaAndAdaptor.SetButton(_mapControl[_keyControl], true);
 			}
