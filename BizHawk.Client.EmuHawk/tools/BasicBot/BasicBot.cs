@@ -57,14 +57,37 @@ namespace BizHawk.Client.EmuHawk
 		#endregion
 
 		#region Network
+
 		private Socket _socket;
 		private IPEndPoint _endPoint;
-		private byte[] _buffer = new byte[1];
+		private byte[] _buffer = new byte[1024];
 		private int _bufferSize = 0;
+
 		private int _keyMove = 0;
+		private int _keyAction = 0;
 		private int _keyControl = 0;
-		private string[] _mapMove = { string.Empty, "P1 Left", "P1 Up", "P1 Right", "P1 Down" };
-		private string[] _mapControl = { string.Empty, "P1 X", "P1 Y", "P1 A", "P1 B" };
+		private string[] _mapMove =
+		{
+			string.Empty,
+			"P1 Left",
+			"P1 Up",
+			"P1 Right",
+			"P1 Down"
+		};
+		private string[] _mapAction =
+		{
+			string.Empty,
+			"P1 X",
+			"P1 Y",
+			"P1 A",
+			"P1 B"
+		};
+		private string[] _mapControl =
+		{
+			string.Empty,
+			"P1 Select",
+			"P1 Start"
+		};
 
 		private int _p1_X = -1;
 		private int _p1_Y = -1;
@@ -81,16 +104,6 @@ namespace BizHawk.Client.EmuHawk
 		private int _timer = 0;
 		private int _winner = 0;
 		private int _roundState = 0;
-
-		public class Data
-		{
-			public int p1_isLeft;
-			public int gap_x;
-			public int gap_y;
-			public int gap_hp_for_p1;
-			public int p1_canInputMove;
-			public int p1_canInputAction;
-		}
 
 		private void ConnectServer()
 		{
@@ -158,57 +171,63 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
+		private void ReceiveFromServer()
+		{
+			Array.Clear(_buffer, 0, _bufferSize);
+
+			_bufferSize = _socket.Receive(_buffer);
+			string data = Encoding.UTF8.GetString(_buffer, 0, _bufferSize);
+			var keys = JsonConvert.DeserializeObject<Dictionary<string, int>>(data);
+
+			try
+			{
+				_keyMove = keys["key_move"];
+			}
+			catch
+			{
+				_keyMove = 0;
+			}
+			try
+			{
+				_keyAction = keys["key_action"];
+			}
+			catch
+			{
+				_keyAction = 0;
+			}
+			try
+			{
+				_keyControl = keys["key_control"];
+			}
+			catch
+			{
+				_keyControl = 0;
+			}
+		}
+
 		private void MakeBuffer()
 		{
 			Array.Clear(_buffer, 0, _bufferSize);
 
-			Data d = new Data
+			Dictionary<string, int> data = new Dictionary<string, int>()
 			{
-				p1_isLeft = (_p1_X > _p2_X) ? 1 : 0,
-				gap_x = Math.Abs(_p1_X - _p2_X),
-				gap_y = Math.Abs(_p1_Y - _p2_Y),
-				gap_hp_for_p1 = _p1_HP - _p2_HP,
-				p1_canInputMove = (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1),
-				p1_canInputAction = (_p1_cannotControl > 0) ? 0 : 1
+				{"p1_is_left", (_p1_X > _p2_X) ? 1 : 0},
+				{"gap_x", Math.Abs(_p1_X - _p2_X)},
+				{"gap_y", Math.Abs(_p1_Y - _p2_Y)},
+				{"gap_hp_for_p1", _p1_HP - _p2_HP},
+				{"p1_can_input_move", (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1)},
+				{"p1_can_input_action", (_p1_cannotControl > 0) ? 0 : 1},
+				{"round_state", _roundState},
+				{"timer", _timer}
 			};
 
-			string json = JsonConvert.SerializeObject(d);
+			string json = JsonConvert.SerializeObject(data);
 			_buffer = Encoding.UTF8.GetBytes(json);
 		}
 
 		private void SendToServer()
 		{
 			_socket.Send(_buffer, SocketFlags.None);
-		}
-
-		private void ReceiveFromServer()
-		{
-			_bufferSize = _socket.Receive(_buffer);
-			string[] keys = Encoding.UTF8.GetString(_buffer, 0, _bufferSize).Split('.');
-			
-			if(keys.Length > 0)
-			{
-				try
-				{
-					_keyMove = int.Parse(keys[0]);
-				}
-				catch
-				{
-					_keyMove = 0;
-				}
-			}
-
-			if(keys.Length > 1)
-			{
-				try
-				{
-					_keyControl = int.Parse(keys[1]);
-				}
-				catch
-				{
-					_keyControl = 0;
-				}
-			}
 		}
 
 		private void PrintBuffer()
@@ -328,7 +347,11 @@ namespace BizHawk.Client.EmuHawk
 			{
 				Global.LuaAndAdaptor.SetButton(_mapMove[_keyMove], true);
 			}
-			if((_keyControl > 0) && (_keyControl < _mapControl.Length))
+			if((_keyAction > 0) && (_keyAction < _mapAction.Length))
+			{
+				Global.LuaAndAdaptor.SetButton(_mapAction[_keyAction], true);
+			}
+			if((_keyControl > 0) && (_keyControl < _mapAction.Length))
 			{
 				Global.LuaAndAdaptor.SetButton(_mapControl[_keyControl], true);
 			}
