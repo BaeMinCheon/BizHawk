@@ -107,8 +107,11 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ConnectServer()
 		{
+			IPAddress ip = IPAddress.Parse(TB_IP.Text);
+			int port = Int32.Parse(TB_Port.Text);
+
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-			_endPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 7000);
+			_endPoint = new IPEndPoint(ip, port);
 			_socket.Connect(_endPoint);
 		}
 
