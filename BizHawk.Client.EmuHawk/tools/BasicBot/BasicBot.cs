@@ -117,10 +117,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ReadFeature()
 		{
-			_p1_X = _currentDomain.PeekUshort(0x000022, _isBigEndian);
-			_p1_Y = 192 - _currentDomain.PeekUshort(0x000C0A, _isBigEndian);
-			_p1_HP = _currentDomain.PeekUshort(0x000D12, _isBigEndian);
-			if (_currentDomain.PeekUshort(0x000CB2, _isBigEndian) >= 256)
+			_p1_X = this.GetRamValue(0x000022);
+			_p1_Y = 192 - this.GetRamValue(0x000C0A);
+			_p1_HP = this.GetRamValue(0x000C0A);
+			if (this.GetRamValue(0x000CB2) >= 256)
 			{
 				_p1_isAttacking = 1;
 			}
@@ -132,7 +132,7 @@ namespace BizHawk.Client.EmuHawk
 			{
 				_p1_isHitting = 1;
 			}
-			else if(_currentDomain.PeekUshort(0x000C58, _isBigEndian) >= 256)
+			else if(this.GetRamValue(0x000C58) >= 256)
 			{
 				_p1_wasHitting = 1;
 				_p1_isHitting = 1;
@@ -144,12 +144,12 @@ namespace BizHawk.Client.EmuHawk
 			}
 			_p1_cannotControl = ((_p1_isAttacking + _p1_isHitting) > 0) ? 1 : 0;
 
-			_p2_X = _currentDomain.PeekUshort(0x000026, _isBigEndian);
-			_p2_Y = 192 - _currentDomain.PeekUshort(0x000E0A, _isBigEndian);
-			_p2_HP = _currentDomain.PeekUshort(0x000F12, _isBigEndian);
+			_p2_X = this.GetRamValue(0x000026);
+			_p2_Y = 192 - this.GetRamValue(0x000E0A);
+			_p2_HP = this.GetRamValue(0x000F12);
 
-			_timer = _currentDomain.PeekUshort(0x001AC8, _isBigEndian);
-			_winner = _currentDomain.PeekUshort(0x001ACE, _isBigEndian);
+			_timer = this.GetRamValue(0x001AC8);
+			_winner = this.GetRamValue(0x001ACE);
 			switch(_roundState)
 			{
 				// before round
@@ -452,7 +452,7 @@ namespace BizHawk.Client.EmuHawk
 			_isBigEndian = _MemoryDomains[name].EndianType == MemoryDomain.Endian.Big;
 		}
 
-		private int GetRamvalue(int addr)
+		private int GetRamValue(int addr)
 		{
 			int val;
 			switch (_dataSize)

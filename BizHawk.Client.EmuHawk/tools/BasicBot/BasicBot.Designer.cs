@@ -67,11 +67,17 @@
             this.TB_IP = new System.Windows.Forms.TextBox();
             this.L_Port = new System.Windows.Forms.Label();
             this.L_IP = new System.Windows.Forms.Label();
+            this.GB_Information = new System.Windows.Forms.GroupBox();
+            this.LB_Input = new System.Windows.Forms.ListBox();
+            this.L_Input = new System.Windows.Forms.Label();
+            this.L_Output = new System.Windows.Forms.Label();
+            this.LB_Output = new System.Windows.Forms.ListBox();
             this.BotMenu.SuspendLayout();
             this.ControlGroupBox.SuspendLayout();
             this.panel2.SuspendLayout();
             this.StatsContextMenu.SuspendLayout();
             this.GB_Server.SuspendLayout();
+            this.GB_Information.SuspendLayout();
             this.SuspendLayout();
             // 
             // BotMenu
@@ -413,13 +419,86 @@
             this.L_IP.TabIndex = 0;
             this.L_IP.Text = "IP";
             // 
+            // GB_Information
+            // 
+            this.GB_Information.Controls.Add(this.LB_Output);
+            this.GB_Information.Controls.Add(this.L_Output);
+            this.GB_Information.Controls.Add(this.L_Input);
+            this.GB_Information.Controls.Add(this.LB_Input);
+            this.GB_Information.Location = new System.Drawing.Point(12, 171);
+            this.GB_Information.Name = "GB_Information";
+            this.GB_Information.Size = new System.Drawing.Size(538, 148);
+            this.GB_Information.TabIndex = 2007;
+            this.GB_Information.TabStop = false;
+            this.GB_Information.Text = "Information";
+            // 
+            // LB_Input
+            // 
+            this.LB_Input.FormattingEnabled = true;
+            this.LB_Input.ItemHeight = 12;
+            this.LB_Input.Items.AddRange(new object[] {
+            "Move:",
+            "    P1 Left",
+            "    P1 Up",
+            "    P1 Right",
+            "    P1 Down",
+            "Action:",
+            "    P1 X",
+            "    P1 Y",
+            "    P1 A",
+            "    P1 B",
+            "Control:",
+            "    P1 Select",
+            "    P1 Start"});
+            this.LB_Input.Location = new System.Drawing.Point(15, 44);
+            this.LB_Input.Name = "LB_Input";
+            this.LB_Input.Size = new System.Drawing.Size(244, 88);
+            this.LB_Input.TabIndex = 0;
+            // 
+            // L_Input
+            // 
+            this.L_Input.AutoSize = true;
+            this.L_Input.Location = new System.Drawing.Point(17, 21);
+            this.L_Input.Name = "L_Input";
+            this.L_Input.Size = new System.Drawing.Size(56, 12);
+            this.L_Input.TabIndex = 1;
+            this.L_Input.Text = "Input List";
+            // 
+            // L_Output
+            // 
+            this.L_Output.AutoSize = true;
+            this.L_Output.Location = new System.Drawing.Point(272, 21);
+            this.L_Output.Name = "L_Output";
+            this.L_Output.Size = new System.Drawing.Size(65, 12);
+            this.L_Output.TabIndex = 2;
+            this.L_Output.Text = "Output List";
+            // 
+            // LB_Output
+            // 
+            this.LB_Output.FormattingEnabled = true;
+            this.LB_Output.ItemHeight = 12;
+            this.LB_Output.Items.AddRange(new object[] {
+            "p1_is_left",
+            "gap_x",
+            "gap_y",
+            "gap_hp_for_p1",
+            "p1_can_input_move",
+            "p1_can_input_action",
+            "round_state",
+            "timer"});
+            this.LB_Output.Location = new System.Drawing.Point(274, 44);
+            this.LB_Output.Name = "LB_Output";
+            this.LB_Output.Size = new System.Drawing.Size(244, 88);
+            this.LB_Output.TabIndex = 3;
+            // 
             // BasicBot
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.AutoSize = true;
             this.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
-            this.ClientSize = new System.Drawing.Size(562, 178);
+            this.ClientSize = new System.Drawing.Size(562, 331);
+            this.Controls.Add(this.GB_Information);
             this.Controls.Add(this.GB_Server);
             this.Controls.Add(this.ControlGroupBox);
             this.Controls.Add(this.BotMenu);
@@ -438,6 +517,8 @@
             this.StatsContextMenu.ResumeLayout(false);
             this.GB_Server.ResumeLayout(false);
             this.GB_Server.PerformLayout();
+            this.GB_Information.ResumeLayout(false);
+            this.GB_Information.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -482,5 +563,10 @@
 		private System.Windows.Forms.Label L_IP;
 		private System.Windows.Forms.TextBox TB_Port;
 		private System.Windows.Forms.TextBox TB_IP;
+		private System.Windows.Forms.GroupBox GB_Information;
+		private System.Windows.Forms.ListBox LB_Input;
+		private System.Windows.Forms.ListBox LB_Output;
+		private System.Windows.Forms.Label L_Output;
+		private System.Windows.Forms.Label L_Input;
 	}
 }
