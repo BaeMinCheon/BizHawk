@@ -1,0 +1,37 @@
+{
+	"InputList" :
+	{
+		"Move" :
+		[
+			"P1 Left",
+			"P1 Up",
+			"P1 Right",
+			"P1 Down"
+		],
+		"Action" :
+		[
+			"P1 X",
+			"P1 Y",
+			"P1 A",
+			"P1 B"
+		],
+		"Control" :
+		[
+			"P1 Select",
+			"P1 Start"
+		]
+	},
+	"OutputList" :
+	{
+		"P1.Position.X" : 34,
+		"P1.Position.Y.Raw" : 3082,
+		"P1.HP.Current" : 3346,
+		"P1.IsAttacking.Raw" : 3250,
+		"P1.IsHitting.Raw" : 3160,
+		"P2.Position.X" : 38,
+		"P2.Position.Y.Raw" : 3594,
+		"P2.HP.Current" : 3858,
+		"RoundTimer" : 6856,
+		"Winner.Player.Raw" : 6862
+	}
+}
