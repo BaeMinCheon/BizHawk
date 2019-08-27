@@ -68,10 +68,10 @@
             this.L_Port = new System.Windows.Forms.Label();
             this.L_IP = new System.Windows.Forms.Label();
             this.GB_Information = new System.Windows.Forms.GroupBox();
-            this.LB_Input = new System.Windows.Forms.ListBox();
-            this.L_Input = new System.Windows.Forms.Label();
-            this.L_Output = new System.Windows.Forms.Label();
             this.LB_Output = new System.Windows.Forms.ListBox();
+            this.L_Output = new System.Windows.Forms.Label();
+            this.L_Input = new System.Windows.Forms.Label();
+            this.LB_Input = new System.Windows.Forms.ListBox();
             this.BotMenu.SuspendLayout();
             this.ControlGroupBox.SuspendLayout();
             this.panel2.SuspendLayout();
@@ -104,7 +104,7 @@
             this.toolStripSeparator1,
             this.ExitMenuItem});
             this.FileSubMenu.Name = "FileSubMenu";
-            this.FileSubMenu.Size = new System.Drawing.Size(41, 20);
+            this.FileSubMenu.Size = new System.Drawing.Size(37, 20);
             this.FileSubMenu.Text = "&File";
             // 
             // NewMenuItem
@@ -112,7 +112,7 @@
             this.NewMenuItem.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.NewFile;
             this.NewMenuItem.Name = "NewMenuItem";
             this.NewMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.NewMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.NewMenuItem.Size = new System.Drawing.Size(199, 22);
             this.NewMenuItem.Text = "&New";
             // 
             // OpenMenuItem
@@ -120,7 +120,7 @@
             this.OpenMenuItem.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.OpenFile;
             this.OpenMenuItem.Name = "OpenMenuItem";
             this.OpenMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.OpenMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.OpenMenuItem.Size = new System.Drawing.Size(199, 22);
             this.OpenMenuItem.Text = "&Open...";
             // 
             // SaveMenuItem
@@ -128,7 +128,7 @@
             this.SaveMenuItem.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.SaveAs;
             this.SaveMenuItem.Name = "SaveMenuItem";
             this.SaveMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.SaveMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.SaveMenuItem.Size = new System.Drawing.Size(199, 22);
             this.SaveMenuItem.Text = "&Save";
             // 
             // SaveAsMenuItem
@@ -136,7 +136,7 @@
             this.SaveAsMenuItem.Name = "SaveAsMenuItem";
             this.SaveAsMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
             | System.Windows.Forms.Keys.S)));
-            this.SaveAsMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.SaveAsMenuItem.Size = new System.Drawing.Size(199, 22);
             this.SaveAsMenuItem.Text = "Save &As...";
             // 
             // RecentSubMenu
@@ -145,7 +145,7 @@
             this.toolStripSeparator2});
             this.RecentSubMenu.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.Recent;
             this.RecentSubMenu.Name = "RecentSubMenu";
-            this.RecentSubMenu.Size = new System.Drawing.Size(213, 22);
+            this.RecentSubMenu.Size = new System.Drawing.Size(199, 22);
             this.RecentSubMenu.Text = "Recent";
             // 
             // toolStripSeparator2
@@ -156,13 +156,13 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(210, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(196, 6);
             // 
             // ExitMenuItem
             // 
             this.ExitMenuItem.Name = "ExitMenuItem";
             this.ExitMenuItem.ShortcutKeyDisplayString = "Alt+F4";
-            this.ExitMenuItem.Size = new System.Drawing.Size(213, 22);
+            this.ExitMenuItem.Size = new System.Drawing.Size(199, 22);
             this.ExitMenuItem.Text = "E&xit";
             // 
             // OptionsSubMenu
@@ -174,7 +174,7 @@
             this.toolStripSeparator4,
             this.TurboWhileBottingMenuItem});
             this.OptionsSubMenu.Name = "OptionsSubMenu";
-            this.OptionsSubMenu.Size = new System.Drawing.Size(59, 20);
+            this.OptionsSubMenu.Size = new System.Drawing.Size(61, 20);
             this.OptionsSubMenu.Text = "&Options";
             // 
             // MemoryDomainsMenuItem
@@ -182,7 +182,7 @@
             this.MemoryDomainsMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripSeparator3});
             this.MemoryDomainsMenuItem.Name = "MemoryDomainsMenuItem";
-            this.MemoryDomainsMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.MemoryDomainsMenuItem.Size = new System.Drawing.Size(182, 22);
             this.MemoryDomainsMenuItem.Text = "Memory Domains";
             this.MemoryDomainsMenuItem.DropDownOpened += new System.EventHandler(this.MemoryDomainsMenuItem_DropDownOpened);
             // 
@@ -198,47 +198,47 @@
             this._2ByteMenuItem,
             this._4ByteMenuItem});
             this.DataSizeMenuItem.Name = "DataSizeMenuItem";
-            this.DataSizeMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.DataSizeMenuItem.Size = new System.Drawing.Size(182, 22);
             this.DataSizeMenuItem.Text = "Data Size";
             this.DataSizeMenuItem.DropDownOpened += new System.EventHandler(this.DataSizeMenuItem_DropDownOpened);
             // 
             // _1ByteMenuItem
             // 
             this._1ByteMenuItem.Name = "_1ByteMenuItem";
-            this._1ByteMenuItem.Size = new System.Drawing.Size(118, 22);
+            this._1ByteMenuItem.Size = new System.Drawing.Size(113, 22);
             this._1ByteMenuItem.Text = "1 Byte";
             this._1ByteMenuItem.Click += new System.EventHandler(this._1ByteMenuItem_Click);
             // 
             // _2ByteMenuItem
             // 
             this._2ByteMenuItem.Name = "_2ByteMenuItem";
-            this._2ByteMenuItem.Size = new System.Drawing.Size(118, 22);
+            this._2ByteMenuItem.Size = new System.Drawing.Size(113, 22);
             this._2ByteMenuItem.Text = "2 Bytes";
             this._2ByteMenuItem.Click += new System.EventHandler(this._2ByteMenuItem_Click);
             // 
             // _4ByteMenuItem
             // 
             this._4ByteMenuItem.Name = "_4ByteMenuItem";
-            this._4ByteMenuItem.Size = new System.Drawing.Size(118, 22);
+            this._4ByteMenuItem.Size = new System.Drawing.Size(113, 22);
             this._4ByteMenuItem.Text = "4 Bytes";
             this._4ByteMenuItem.Click += new System.EventHandler(this._4ByteMenuItem_Click);
             // 
             // BigEndianMenuItem
             // 
             this.BigEndianMenuItem.Name = "BigEndianMenuItem";
-            this.BigEndianMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.BigEndianMenuItem.Size = new System.Drawing.Size(182, 22);
             this.BigEndianMenuItem.Text = "Big Endian";
             this.BigEndianMenuItem.Click += new System.EventHandler(this.BigEndianMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(187, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(179, 6);
             // 
             // TurboWhileBottingMenuItem
             // 
             this.TurboWhileBottingMenuItem.Name = "TurboWhileBottingMenuItem";
-            this.TurboWhileBottingMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.TurboWhileBottingMenuItem.Size = new System.Drawing.Size(182, 22);
             this.TurboWhileBottingMenuItem.Text = "Turbo While Botting";
             // 
             // RunBtn
@@ -363,12 +363,12 @@
             this.StatsContextMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.ClearStatsContextMenuItem});
             this.StatsContextMenu.Name = "StatsContextMenu";
-            this.StatsContextMenu.Size = new System.Drawing.Size(107, 26);
+            this.StatsContextMenu.Size = new System.Drawing.Size(102, 26);
             // 
             // ClearStatsContextMenuItem
             // 
             this.ClearStatsContextMenuItem.Name = "ClearStatsContextMenuItem";
-            this.ClearStatsContextMenuItem.Size = new System.Drawing.Size(106, 22);
+            this.ClearStatsContextMenuItem.Size = new System.Drawing.Size(101, 22);
             this.ClearStatsContextMenuItem.Text = "&Clear";
             this.ClearStatsContextMenuItem.Click += new System.EventHandler(this.ClearStatsContextMenuItem_Click);
             // 
@@ -432,37 +432,14 @@
             this.GB_Information.TabStop = false;
             this.GB_Information.Text = "Information";
             // 
-            // LB_Input
+            // LB_Output
             // 
-            this.LB_Input.FormattingEnabled = true;
-            this.LB_Input.ItemHeight = 12;
-            this.LB_Input.Items.AddRange(new object[] {
-            "Move:",
-            "    P1 Left",
-            "    P1 Up",
-            "    P1 Right",
-            "    P1 Down",
-            "Action:",
-            "    P1 X",
-            "    P1 Y",
-            "    P1 A",
-            "    P1 B",
-            "Control:",
-            "    P1 Select",
-            "    P1 Start"});
-            this.LB_Input.Location = new System.Drawing.Point(15, 44);
-            this.LB_Input.Name = "LB_Input";
-            this.LB_Input.Size = new System.Drawing.Size(244, 88);
-            this.LB_Input.TabIndex = 0;
-            // 
-            // L_Input
-            // 
-            this.L_Input.AutoSize = true;
-            this.L_Input.Location = new System.Drawing.Point(17, 21);
-            this.L_Input.Name = "L_Input";
-            this.L_Input.Size = new System.Drawing.Size(56, 12);
-            this.L_Input.TabIndex = 1;
-            this.L_Input.Text = "Input List";
+            this.LB_Output.FormattingEnabled = true;
+            this.LB_Output.ItemHeight = 12;
+            this.LB_Output.Location = new System.Drawing.Point(274, 44);
+            this.LB_Output.Name = "LB_Output";
+            this.LB_Output.Size = new System.Drawing.Size(244, 88);
+            this.LB_Output.TabIndex = 3;
             // 
             // L_Output
             // 
@@ -473,23 +450,23 @@
             this.L_Output.TabIndex = 2;
             this.L_Output.Text = "Output List";
             // 
-            // LB_Output
+            // L_Input
             // 
-            this.LB_Output.FormattingEnabled = true;
-            this.LB_Output.ItemHeight = 12;
-            this.LB_Output.Items.AddRange(new object[] {
-            "p1_is_left",
-            "gap_x",
-            "gap_y",
-            "gap_hp_for_p1",
-            "p1_can_input_move",
-            "p1_can_input_action",
-            "round_state",
-            "timer"});
-            this.LB_Output.Location = new System.Drawing.Point(274, 44);
-            this.LB_Output.Name = "LB_Output";
-            this.LB_Output.Size = new System.Drawing.Size(244, 88);
-            this.LB_Output.TabIndex = 3;
+            this.L_Input.AutoSize = true;
+            this.L_Input.Location = new System.Drawing.Point(17, 21);
+            this.L_Input.Name = "L_Input";
+            this.L_Input.Size = new System.Drawing.Size(56, 12);
+            this.L_Input.TabIndex = 1;
+            this.L_Input.Text = "Input List";
+            // 
+            // LB_Input
+            // 
+            this.LB_Input.FormattingEnabled = true;
+            this.LB_Input.ItemHeight = 12;
+            this.LB_Input.Location = new System.Drawing.Point(15, 44);
+            this.LB_Input.Name = "LB_Input";
+            this.LB_Input.Size = new System.Drawing.Size(244, 88);
+            this.LB_Input.TabIndex = 0;
             // 
             // BasicBot
             // 

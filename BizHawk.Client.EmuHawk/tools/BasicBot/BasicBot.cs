@@ -14,6 +14,7 @@ using BizHawk.Client.Common;
 using System.Net;
 using System.Net.Sockets;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace BizHawk.Client.EmuHawk
 {
@@ -47,11 +48,50 @@ namespace BizHawk.Client.EmuHawk
 		{
 			this.InitializeComponent();
 			this.Text = DialogTitle;
+
+			this.LoadConfigJson();
 		}
 
 		private void BasicBot_Load(object sender, EventArgs e)
 		{
 			;
+		}
+
+		private void LoadConfigJson()
+		{
+			string ConfigString = System.IO.File.ReadAllText(Directory.GetParent(Directory.GetCurrentDirectory()) + "/Config.json");
+			JObject Configs = JObject.Parse(ConfigString);
+			{
+				JToken InputListToken = Configs.GetValue("InputList");
+				JObject InputList = InputListToken.ToObject<JObject>();
+				{
+					foreach(var Pair in InputList)
+					{
+						_buttons.Add(Pair.Key, 0);
+						_maps.Add(Pair.Key, new List<string>() { string.Empty });
+
+						LB_Input.Items.Add("[" + Pair.Key + "]");
+						var List = Pair.Value;
+						foreach(string Button in List)
+						{
+							LB_Input.Items.Add(Button);
+							_maps[Pair.Key].Add(Button);
+						}
+					}
+				}
+
+				JToken OutputListToken = Configs.GetValue("OutputList");
+				JObject OutputList = OutputListToken.ToObject<JObject>();
+				{
+					foreach(var Pair in OutputList)
+					{
+						_addresses.Add(Pair.Key, Pair.Value.Value<int>());
+						_outputs.Add(Pair.Key, 0);
+
+						LB_Output.Items.Add(Pair.Key);
+					}
+				}
+			}
 		}
 
 		#endregion
@@ -63,31 +103,10 @@ namespace BizHawk.Client.EmuHawk
 		private byte[] _buffer = new byte[1024];
 		private int _bufferSize = 0;
 
-		private int _keyMove = 0;
-		private int _keyAction = 0;
-		private int _keyControl = 0;
-		private string[] _mapMove =
-		{
-			string.Empty,
-			"P1 Left",
-			"P1 Up",
-			"P1 Right",
-			"P1 Down"
-		};
-		private string[] _mapAction =
-		{
-			string.Empty,
-			"P1 X",
-			"P1 Y",
-			"P1 A",
-			"P1 B"
-		};
-		private string[] _mapControl =
-		{
-			string.Empty,
-			"P1 Select",
-			"P1 Start"
-		};
+		private Dictionary<string, int> _buttons = new Dictionary<string, int>();
+		private Dictionary<string, List<string>> _maps = new Dictionary<string, List<string>>();
+		private Dictionary<string, int> _addresses = new Dictionary<string, int>();
+		private Dictionary<string, int> _outputs = new Dictionary<string, int>();
 
 		private int _p1_X = -1;
 		private int _p1_Y = -1;
@@ -117,60 +136,9 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ReadFeature()
 		{
-			_p1_X = this.GetRamValue(0x000022);
-			_p1_Y = 192 - this.GetRamValue(0x000C0A);
-			_p1_HP = this.GetRamValue(0x000C0A);
-			if (this.GetRamValue(0x000CB2) >= 256)
+			foreach(var Pair in _addresses.ToList())
 			{
-				_p1_isAttacking = 1;
-			}
-			else
-			{
-				_p1_isAttacking = 0;
-			}
-			if((_p1_wasHitting == 1) && (_p1_Y > 0))
-			{
-				_p1_isHitting = 1;
-			}
-			else if(this.GetRamValue(0x000C58) >= 256)
-			{
-				_p1_wasHitting = 1;
-				_p1_isHitting = 1;
-			}
-			else
-			{
-				_p1_wasHitting = 0;
-				_p1_isHitting = 0;
-			}
-			_p1_cannotControl = ((_p1_isAttacking + _p1_isHitting) > 0) ? 1 : 0;
-
-			_p2_X = this.GetRamValue(0x000026);
-			_p2_Y = 192 - this.GetRamValue(0x000E0A);
-			_p2_HP = this.GetRamValue(0x000F12);
-
-			_timer = this.GetRamValue(0x001AC8);
-			_winner = this.GetRamValue(0x001ACE);
-			switch(_roundState)
-			{
-				// before round
-				case 0:
-					if (_timer == 152)
-					{
-						_roundState = 1;
-					}
-					else
-					{
-						_timer = 0;
-					}
-					break;
-
-				// in round
-				case 1:
-					if (_winner >= 256)
-					{
-						_roundState = 0;
-					}
-					break;
+				_outputs[Pair.Key] = this.GetRamValue(Pair.Value);
 			}
 		}
 
@@ -182,29 +150,16 @@ namespace BizHawk.Client.EmuHawk
 			string data = Encoding.UTF8.GetString(_buffer, 0, _bufferSize);
 			var keys = JsonConvert.DeserializeObject<Dictionary<string, int>>(data);
 
-			try
+			foreach(var Pair in _buttons.ToList())
 			{
-				_keyMove = keys["key_move"];
-			}
-			catch
-			{
-				_keyMove = 0;
-			}
-			try
-			{
-				_keyAction = keys["key_action"];
-			}
-			catch
-			{
-				_keyAction = 0;
-			}
-			try
-			{
-				_keyControl = keys["key_control"];
-			}
-			catch
-			{
-				_keyControl = 0;
+				try
+				{
+					_buttons[Pair.Key] = keys[Pair.Key];
+				}
+				catch
+				{
+					_buttons[Pair.Key] = 0;
+				}
 			}
 		}
 
@@ -212,17 +167,11 @@ namespace BizHawk.Client.EmuHawk
 		{
 			Array.Clear(_buffer, 0, _bufferSize);
 
-			Dictionary<string, int> data = new Dictionary<string, int>()
+			Dictionary<string, int> data = new Dictionary<string, int>();
+			foreach(var Pair in _outputs)
 			{
-				{"p1_is_left", (_p1_X > _p2_X) ? 1 : 0},
-				{"gap_x", Math.Abs(_p1_X - _p2_X)},
-				{"gap_y", Math.Abs(_p1_Y - _p2_Y)},
-				{"gap_hp_for_p1", _p1_HP - _p2_HP},
-				{"p1_can_input_move", (_p1_cannotControl > 0) ? 0 : ((_p1_Y > 0) ? 0 : 1)},
-				{"p1_can_input_action", (_p1_cannotControl > 0) ? 0 : 1},
-				{"round_state", _roundState},
-				{"timer", _timer}
-			};
+				data.Add(Pair.Key, Pair.Value);
+			}
 
 			string json = JsonConvert.SerializeObject(data);
 			_buffer = Encoding.UTF8.GetBytes(json);
@@ -346,17 +295,12 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PressButtons()
 		{
-			if((_keyMove > 0) && (_keyMove < _mapMove.Length))
+			foreach(var Pair in _buttons.ToList())
 			{
-				Global.LuaAndAdaptor.SetButton(_mapMove[_keyMove], true);
-			}
-			if((_keyAction > 0) && (_keyAction < _mapAction.Length))
-			{
-				Global.LuaAndAdaptor.SetButton(_mapAction[_keyAction], true);
-			}
-			if((_keyControl > 0) && (_keyControl < _mapAction.Length))
-			{
-				Global.LuaAndAdaptor.SetButton(_mapControl[_keyControl], true);
+				if((0 < Pair.Value) && (Pair.Value < _maps[Pair.Key].Count))
+				{
+					Global.LuaAndAdaptor.SetButton(_maps[Pair.Key][Pair.Value], true);
+				}
 			}
 		}
 
