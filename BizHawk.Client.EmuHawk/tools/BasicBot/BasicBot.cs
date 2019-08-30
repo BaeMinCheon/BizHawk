@@ -85,7 +85,7 @@ namespace BizHawk.Client.EmuHawk
 				{
 					foreach(var Pair in OutputList)
 					{
-						_addresses.Add(Pair.Key, Pair.Value.Value<int>());
+						_addresses.Add(Pair.Key, Convert.ToInt32(Pair.Value.ToString(), 16));
 						_outputs.Add(Pair.Key, 0);
 
 						LB_Output.Items.Add(Pair.Key);
