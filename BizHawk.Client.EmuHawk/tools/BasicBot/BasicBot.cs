@@ -49,7 +49,7 @@ namespace BizHawk.Client.EmuHawk
 			this.InitializeComponent();
 			this.Text = DialogTitle;
 
-			this.LoadConfigJson();
+			this.LoadConfig();
 		}
 
 		private void BasicBot_Load(object sender, EventArgs e)
@@ -57,7 +57,7 @@ namespace BizHawk.Client.EmuHawk
 			;
 		}
 
-		private void LoadConfigJson()
+		private void LoadConfig()
 		{
 			string ConfigString = System.IO.File.ReadAllText(Directory.GetParent(Directory.GetCurrentDirectory()) + "/Config.json");
 			JObject Configs = JObject.Parse(ConfigString);
@@ -100,8 +100,8 @@ namespace BizHawk.Client.EmuHawk
 
 		private Socket _socket;
 		private IPEndPoint _endPoint;
-		private byte[] _buffer = new byte[1024];
-		private int _bufferSize = 0;
+		private byte[] _packet = new byte[1024];
+		private int _packetSize = 0;
 
 		private Dictionary<string, int> _buttons = new Dictionary<string, int>();
 		private Dictionary<string, List<string>> _maps = new Dictionary<string, List<string>>();
@@ -118,7 +118,12 @@ namespace BizHawk.Client.EmuHawk
 			_socket.Connect(_endPoint);
 		}
 
-		private void ReadFeature()
+		private void DisconnectServer()
+		{
+			_socket.Close();
+		}
+
+		private void ReadMemory()
 		{
 			foreach(var Pair in _addresses.ToList())
 			{
@@ -126,12 +131,31 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		private void ReceiveFromServer()
+		private void MakePacket()
 		{
-			Array.Clear(_buffer, 0, _bufferSize);
+			Array.Clear(_packet, 0, _packetSize);
 
-			_bufferSize = _socket.Receive(_buffer);
-			string data = Encoding.UTF8.GetString(_buffer, 0, _bufferSize);
+			Dictionary<string, int> data = new Dictionary<string, int>();
+			foreach (var Pair in _outputs)
+			{
+				data.Add(Pair.Key, Pair.Value);
+			}
+
+			string json = JsonConvert.SerializeObject(data);
+			_packet = Encoding.UTF8.GetBytes(json);
+		}
+
+		private void SendPacket()
+		{
+			_socket.Send(_packet, SocketFlags.None);
+		}
+
+		private void ReceiveAction()
+		{
+			Array.Clear(_packet, 0, _packetSize);
+
+			_packetSize = _socket.Receive(_packet);
+			string data = Encoding.UTF8.GetString(_packet, 0, _packetSize);
 			var keys = JsonConvert.DeserializeObject<Dictionary<string, int>>(data);
 
 			foreach(var Pair in _buttons.ToList())
@@ -147,34 +171,11 @@ namespace BizHawk.Client.EmuHawk
 			}
 		}
 
-		private void MakeBuffer()
+		private void PrintPacket()
 		{
-			Array.Clear(_buffer, 0, _bufferSize);
-
-			Dictionary<string, int> data = new Dictionary<string, int>();
-			foreach(var Pair in _outputs)
-			{
-				data.Add(Pair.Key, Pair.Value);
-			}
-
-			string json = JsonConvert.SerializeObject(data);
-			_buffer = Encoding.UTF8.GetBytes(json);
+			Console.WriteLine(Encoding.UTF8.GetString(_packet, 0, _packetSize));
 		}
 
-		private void SendToServer()
-		{
-			_socket.Send(_buffer, SocketFlags.None);
-		}
-
-		private void PrintBuffer()
-		{
-			Console.WriteLine(Encoding.UTF8.GetString(_buffer, 0, _bufferSize));
-		}
-
-		private void DisconnectServer()
-		{
-			_socket.Close();
-		}
 		#endregion
 
 		#region UI Bindings
@@ -257,14 +258,14 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if(_isBotting)
 			{
-				this.ReadFeature();
+				this.ReadMemory();
 
 				GlobalWin.MainForm.PauseEmulator();
 
-				this.ReceiveFromServer();
-				this.MakeBuffer();
-				this.SendToServer();
-				this.PrintBuffer();
+				this.ReceiveAction();
+				this.MakePacket();
+				this.SendPacket();
+				this.PrintPacket();
 
 				GlobalWin.MainForm.UnpauseEmulator();
 
