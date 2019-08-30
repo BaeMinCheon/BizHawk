@@ -108,22 +108,6 @@ namespace BizHawk.Client.EmuHawk
 		private Dictionary<string, int> _addresses = new Dictionary<string, int>();
 		private Dictionary<string, int> _outputs = new Dictionary<string, int>();
 
-		private int _p1_X = -1;
-		private int _p1_Y = -1;
-		private int _p1_HP = -1;
-		private int _p1_isAttacking = 0;
-		private int _p1_wasHitting = 0;
-		private int _p1_isHitting = 0;
-		private int _p1_cannotControl = 0;
-
-		private int _p2_X = -1;
-		private int _p2_Y = -1;
-		private int _p2_HP = -1;
-
-		private int _timer = 0;
-		private int _winner = 0;
-		private int _roundState = 0;
-
 		private void ConnectServer()
 		{
 			IPAddress ip = IPAddress.Parse(TB_IP.Text);
