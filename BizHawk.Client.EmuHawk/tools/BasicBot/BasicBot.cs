@@ -48,8 +48,6 @@ namespace BizHawk.Client.EmuHawk
 		{
 			this.InitializeComponent();
 			this.Text = DialogTitle;
-
-			this.LoadConfig();
 		}
 
 		private void BasicBot_Load(object sender, EventArgs e)
@@ -59,36 +57,47 @@ namespace BizHawk.Client.EmuHawk
 
 		private void LoadConfig()
 		{
-			string ConfigString = System.IO.File.ReadAllText(Directory.GetParent(Directory.GetCurrentDirectory()) + "/Config.json");
-			JObject Configs = JObject.Parse(ConfigString);
+			OpenFileDialog Dialog = new OpenFileDialog();
+			if (Dialog.ShowDialog() == DialogResult.OK)
 			{
-				JToken InputListToken = Configs.GetValue("InputList");
-				JObject InputList = InputListToken.ToObject<JObject>();
-				{
-					foreach(var Pair in InputList)
-					{
-						_buttons.Add(Pair.Key, 0);
-						_maps.Add(Pair.Key, new List<string>() { string.Empty });
+				InputLstBx.Items.Clear();
+				OutputLstBx.Items.Clear();
+				_buttons.Clear();
+				_maps.Clear();
+				_addresses.Clear();
+				_outputs.Clear();
 
-						LB_Input.Items.Add("[" + Pair.Key + "]");
-						var List = Pair.Value;
-						foreach(string Button in List)
+				string ConfigString = System.IO.File.ReadAllText(Dialog.FileName);
+				JObject Configs = JObject.Parse(ConfigString);
+				{
+					JToken InputListToken = Configs.GetValue("InputList");
+					JObject InputList = InputListToken.ToObject<JObject>();
+					{
+						foreach (var Pair in InputList)
 						{
-							LB_Input.Items.Add(Button);
-							_maps[Pair.Key].Add(Button);
+							_buttons.Add(Pair.Key, 0);
+							_maps.Add(Pair.Key, new List<string>() { string.Empty });
+
+							InputLstBx.Items.Add("[" + Pair.Key + "]");
+							var List = Pair.Value;
+							foreach (string Button in List)
+							{
+								InputLstBx.Items.Add(Button);
+								_maps[Pair.Key].Add(Button);
+							}
 						}
 					}
-				}
 
-				JToken OutputListToken = Configs.GetValue("OutputList");
-				JObject OutputList = OutputListToken.ToObject<JObject>();
-				{
-					foreach(var Pair in OutputList)
+					JToken OutputListToken = Configs.GetValue("OutputList");
+					JObject OutputList = OutputListToken.ToObject<JObject>();
 					{
-						_addresses.Add(Pair.Key, Convert.ToInt32(Pair.Value.ToString(), 16));
-						_outputs.Add(Pair.Key, 0);
+						foreach (var Pair in OutputList)
+						{
+							_addresses.Add(Pair.Key, Convert.ToInt32(Pair.Value.ToString(), 16));
+							_outputs.Add(Pair.Key, 0);
 
-						LB_Output.Items.Add(Pair.Key);
+							OutputLstBx.Items.Add(Pair.Key + " : " + Pair.Value);
+						}
 					}
 				}
 			}
@@ -461,6 +470,11 @@ namespace BizHawk.Client.EmuHawk
 		private void SetNormalSpeed()
 		{
 			GlobalWin.MainForm.Throttle();
+		}
+
+		private void LoadConfigBtn_Click(object sender, EventArgs e)
+		{
+			this.LoadConfig();
 		}
 	}
 }
