@@ -51,15 +51,11 @@
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
             this.TurboWhileBottingMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.RunBtn = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.AttemptsLabel = new System.Windows.Forms.Label();
-            this.FramesLabel = new System.Windows.Forms.Label();
             this.StopBtn = new System.Windows.Forms.Button();
             this.label8 = new System.Windows.Forms.Label();
             this.StartFromSlotBox = new System.Windows.Forms.ComboBox();
             this.ControlGroupBox = new System.Windows.Forms.GroupBox();
-            this.panel2 = new System.Windows.Forms.Panel();
+            this.LoadConfigBtn = new System.Windows.Forms.Button();
             this.StatsContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ClearStatsContextMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.GB_Server = new System.Windows.Forms.GroupBox();
@@ -68,13 +64,12 @@
             this.L_Port = new System.Windows.Forms.Label();
             this.L_IP = new System.Windows.Forms.Label();
             this.GB_Information = new System.Windows.Forms.GroupBox();
-            this.LB_Output = new System.Windows.Forms.ListBox();
-            this.L_Output = new System.Windows.Forms.Label();
-            this.L_Input = new System.Windows.Forms.Label();
-            this.LB_Input = new System.Windows.Forms.ListBox();
+            this.OutputLstBx = new System.Windows.Forms.ListBox();
+            this.OutputLbl = new System.Windows.Forms.Label();
+            this.InputLbl = new System.Windows.Forms.Label();
+            this.InputLstBx = new System.Windows.Forms.ListBox();
             this.BotMenu.SuspendLayout();
             this.ControlGroupBox.SuspendLayout();
-            this.panel2.SuspendLayout();
             this.StatsContextMenu.SuspendLayout();
             this.GB_Server.SuspendLayout();
             this.GB_Information.SuspendLayout();
@@ -245,7 +240,7 @@
             // 
             this.RunBtn.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.Play;
             this.RunBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.RunBtn.Location = new System.Drawing.Point(10, 62);
+            this.RunBtn.Location = new System.Drawing.Point(10, 68);
             this.RunBtn.Name = "RunBtn";
             this.RunBtn.Size = new System.Drawing.Size(87, 21);
             this.RunBtn.TabIndex = 2001;
@@ -253,47 +248,11 @@
             this.RunBtn.UseVisualStyleBackColor = true;
             this.RunBtn.Click += new System.EventHandler(this.RunBtn_Click);
             // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 2);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(58, 12);
-            this.label1.TabIndex = 5;
-            this.label1.Text = "Attempts:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 16);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 12);
-            this.label2.TabIndex = 6;
-            this.label2.Text = "Frames:";
-            // 
-            // AttemptsLabel
-            // 
-            this.AttemptsLabel.AutoSize = true;
-            this.AttemptsLabel.Location = new System.Drawing.Point(71, 2);
-            this.AttemptsLabel.Name = "AttemptsLabel";
-            this.AttemptsLabel.Size = new System.Drawing.Size(11, 12);
-            this.AttemptsLabel.TabIndex = 7;
-            this.AttemptsLabel.Text = "0";
-            // 
-            // FramesLabel
-            // 
-            this.FramesLabel.AutoSize = true;
-            this.FramesLabel.Location = new System.Drawing.Point(71, 16);
-            this.FramesLabel.Name = "FramesLabel";
-            this.FramesLabel.Size = new System.Drawing.Size(11, 12);
-            this.FramesLabel.TabIndex = 8;
-            this.FramesLabel.Text = "0";
-            // 
             // StopBtn
             // 
             this.StopBtn.Image = global::BizHawk.Client.EmuHawk.Properties.Resources.Stop;
             this.StopBtn.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.StopBtn.Location = new System.Drawing.Point(103, 62);
+            this.StopBtn.Location = new System.Drawing.Point(103, 68);
             this.StopBtn.Name = "StopBtn";
             this.StopBtn.Size = new System.Drawing.Size(87, 21);
             this.StopBtn.TabIndex = 2002;
@@ -305,7 +264,7 @@
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(8, 32);
+            this.label8.Location = new System.Drawing.Point(8, 17);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(67, 12);
             this.label8.TabIndex = 11;
@@ -326,7 +285,7 @@
             "Slot 7",
             "Slot 8",
             "Slot 9"});
-            this.StartFromSlotBox.Location = new System.Drawing.Point(83, 28);
+            this.StartFromSlotBox.Location = new System.Drawing.Point(81, 14);
             this.StartFromSlotBox.Name = "StartFromSlotBox";
             this.StartFromSlotBox.Size = new System.Drawing.Size(87, 20);
             this.StartFromSlotBox.TabIndex = 2000;
@@ -334,7 +293,7 @@
             // ControlGroupBox
             // 
             this.ControlGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ControlGroupBox.Controls.Add(this.panel2);
+            this.ControlGroupBox.Controls.Add(this.LoadConfigBtn);
             this.ControlGroupBox.Controls.Add(this.StopBtn);
             this.ControlGroupBox.Controls.Add(this.RunBtn);
             this.ControlGroupBox.Controls.Add(this.StartFromSlotBox);
@@ -346,17 +305,15 @@
             this.ControlGroupBox.TabStop = false;
             this.ControlGroupBox.Text = "Control";
             // 
-            // panel2
+            // LoadConfigBtn
             // 
-            this.panel2.ContextMenuStrip = this.StatsContextMenu;
-            this.panel2.Controls.Add(this.label1);
-            this.panel2.Controls.Add(this.label2);
-            this.panel2.Controls.Add(this.FramesLabel);
-            this.panel2.Controls.Add(this.AttemptsLabel);
-            this.panel2.Location = new System.Drawing.Point(10, 95);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(163, 30);
-            this.panel2.TabIndex = 2003;
+            this.LoadConfigBtn.Location = new System.Drawing.Point(10, 39);
+            this.LoadConfigBtn.Name = "LoadConfigBtn";
+            this.LoadConfigBtn.Size = new System.Drawing.Size(180, 23);
+            this.LoadConfigBtn.TabIndex = 2004;
+            this.LoadConfigBtn.Text = "Load Config File";
+            this.LoadConfigBtn.UseVisualStyleBackColor = true;
+            this.LoadConfigBtn.Click += new System.EventHandler(this.LoadConfigBtn_Click);
             // 
             // StatsContextMenu
             // 
@@ -421,10 +378,10 @@
             // 
             // GB_Information
             // 
-            this.GB_Information.Controls.Add(this.LB_Output);
-            this.GB_Information.Controls.Add(this.L_Output);
-            this.GB_Information.Controls.Add(this.L_Input);
-            this.GB_Information.Controls.Add(this.LB_Input);
+            this.GB_Information.Controls.Add(this.OutputLstBx);
+            this.GB_Information.Controls.Add(this.OutputLbl);
+            this.GB_Information.Controls.Add(this.InputLbl);
+            this.GB_Information.Controls.Add(this.InputLstBx);
             this.GB_Information.Location = new System.Drawing.Point(12, 171);
             this.GB_Information.Name = "GB_Information";
             this.GB_Information.Size = new System.Drawing.Size(538, 148);
@@ -432,41 +389,41 @@
             this.GB_Information.TabStop = false;
             this.GB_Information.Text = "Information";
             // 
-            // LB_Output
+            // OutputLstBx
             // 
-            this.LB_Output.FormattingEnabled = true;
-            this.LB_Output.ItemHeight = 12;
-            this.LB_Output.Location = new System.Drawing.Point(274, 44);
-            this.LB_Output.Name = "LB_Output";
-            this.LB_Output.Size = new System.Drawing.Size(244, 88);
-            this.LB_Output.TabIndex = 3;
+            this.OutputLstBx.FormattingEnabled = true;
+            this.OutputLstBx.ItemHeight = 12;
+            this.OutputLstBx.Location = new System.Drawing.Point(274, 44);
+            this.OutputLstBx.Name = "OutputLstBx";
+            this.OutputLstBx.Size = new System.Drawing.Size(244, 88);
+            this.OutputLstBx.TabIndex = 3;
             // 
-            // L_Output
+            // OutputLbl
             // 
-            this.L_Output.AutoSize = true;
-            this.L_Output.Location = new System.Drawing.Point(272, 21);
-            this.L_Output.Name = "L_Output";
-            this.L_Output.Size = new System.Drawing.Size(65, 12);
-            this.L_Output.TabIndex = 2;
-            this.L_Output.Text = "Output List";
+            this.OutputLbl.AutoSize = true;
+            this.OutputLbl.Location = new System.Drawing.Point(272, 21);
+            this.OutputLbl.Name = "OutputLbl";
+            this.OutputLbl.Size = new System.Drawing.Size(65, 12);
+            this.OutputLbl.TabIndex = 2;
+            this.OutputLbl.Text = "Output List";
             // 
-            // L_Input
+            // InputLbl
             // 
-            this.L_Input.AutoSize = true;
-            this.L_Input.Location = new System.Drawing.Point(17, 21);
-            this.L_Input.Name = "L_Input";
-            this.L_Input.Size = new System.Drawing.Size(56, 12);
-            this.L_Input.TabIndex = 1;
-            this.L_Input.Text = "Input List";
+            this.InputLbl.AutoSize = true;
+            this.InputLbl.Location = new System.Drawing.Point(17, 21);
+            this.InputLbl.Name = "InputLbl";
+            this.InputLbl.Size = new System.Drawing.Size(56, 12);
+            this.InputLbl.TabIndex = 1;
+            this.InputLbl.Text = "Input List";
             // 
-            // LB_Input
+            // InputLstBx
             // 
-            this.LB_Input.FormattingEnabled = true;
-            this.LB_Input.ItemHeight = 12;
-            this.LB_Input.Location = new System.Drawing.Point(15, 44);
-            this.LB_Input.Name = "LB_Input";
-            this.LB_Input.Size = new System.Drawing.Size(244, 88);
-            this.LB_Input.TabIndex = 0;
+            this.InputLstBx.FormattingEnabled = true;
+            this.InputLstBx.ItemHeight = 12;
+            this.InputLstBx.Location = new System.Drawing.Point(15, 44);
+            this.InputLstBx.Name = "InputLstBx";
+            this.InputLstBx.Size = new System.Drawing.Size(244, 88);
+            this.InputLstBx.TabIndex = 0;
             // 
             // BasicBot
             // 
@@ -489,8 +446,6 @@
             this.BotMenu.PerformLayout();
             this.ControlGroupBox.ResumeLayout(false);
             this.ControlGroupBox.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             this.StatsContextMenu.ResumeLayout(false);
             this.GB_Server.ResumeLayout(false);
             this.GB_Server.PerformLayout();
@@ -511,10 +466,6 @@
 		private System.Windows.Forms.ToolStripMenuItem SaveMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem RecentSubMenu;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
-		private System.Windows.Forms.Label label1;
-		private System.Windows.Forms.Label label2;
-		private System.Windows.Forms.Label AttemptsLabel;
-		private System.Windows.Forms.Label FramesLabel;
 		private System.Windows.Forms.ToolStripMenuItem OptionsSubMenu;
 		private System.Windows.Forms.Button StopBtn;
 		private System.Windows.Forms.Label label8;
@@ -526,7 +477,6 @@
 		private System.Windows.Forms.ToolStripMenuItem TurboWhileBottingMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem MemoryDomainsMenuItem;
 		private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
-		private System.Windows.Forms.Panel panel2;
 		private System.Windows.Forms.ContextMenuStrip StatsContextMenu;
 		private System.Windows.Forms.ToolStripMenuItem ClearStatsContextMenuItem;
 		private System.Windows.Forms.ToolStripMenuItem BigEndianMenuItem;
@@ -541,9 +491,10 @@
 		private System.Windows.Forms.TextBox TB_Port;
 		private System.Windows.Forms.TextBox TB_IP;
 		private System.Windows.Forms.GroupBox GB_Information;
-		private System.Windows.Forms.ListBox LB_Input;
-		private System.Windows.Forms.ListBox LB_Output;
-		private System.Windows.Forms.Label L_Output;
-		private System.Windows.Forms.Label L_Input;
+		private System.Windows.Forms.ListBox InputLstBx;
+		private System.Windows.Forms.ListBox OutputLstBx;
+		private System.Windows.Forms.Label OutputLbl;
+		private System.Windows.Forms.Label InputLbl;
+		private System.Windows.Forms.Button LoadConfigBtn;
 	}
 }

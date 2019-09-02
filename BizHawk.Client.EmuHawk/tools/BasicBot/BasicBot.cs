@@ -48,8 +48,7 @@ namespace BizHawk.Client.EmuHawk
 		{
 			this.InitializeComponent();
 			this.Text = DialogTitle;
-
-			this.LoadConfig();
+			RunBtn.Enabled = false;
 		}
 
 		private void BasicBot_Load(object sender, EventArgs e)
@@ -59,38 +58,51 @@ namespace BizHawk.Client.EmuHawk
 
 		private void LoadConfig()
 		{
-			string ConfigString = System.IO.File.ReadAllText(Directory.GetParent(Directory.GetCurrentDirectory()) + "/Config.json");
-			JObject Configs = JObject.Parse(ConfigString);
+			OpenFileDialog Dialog = new OpenFileDialog();
+			if (Dialog.ShowDialog() == DialogResult.OK)
 			{
-				JToken InputListToken = Configs.GetValue("InputList");
-				JObject InputList = InputListToken.ToObject<JObject>();
-				{
-					foreach(var Pair in InputList)
-					{
-						_buttons.Add(Pair.Key, 0);
-						_maps.Add(Pair.Key, new List<string>() { string.Empty });
+				InputLstBx.Items.Clear();
+				OutputLstBx.Items.Clear();
+				_buttons.Clear();
+				_maps.Clear();
+				_addresses.Clear();
+				_outputs.Clear();
 
-						LB_Input.Items.Add("[" + Pair.Key + "]");
-						var List = Pair.Value;
-						foreach(string Button in List)
+				string ConfigString = System.IO.File.ReadAllText(Dialog.FileName);
+				JObject Configs = JObject.Parse(ConfigString);
+				{
+					JToken InputListToken = Configs.GetValue("InputList");
+					JObject InputList = InputListToken.ToObject<JObject>();
+					{
+						foreach (var Pair in InputList)
 						{
-							LB_Input.Items.Add(Button);
-							_maps[Pair.Key].Add(Button);
+							_buttons.Add(Pair.Key, 0);
+							_maps.Add(Pair.Key, new List<string>() { string.Empty });
+
+							InputLstBx.Items.Add("[" + Pair.Key + "]");
+							var List = Pair.Value;
+							foreach (string Button in List)
+							{
+								InputLstBx.Items.Add(Button);
+								_maps[Pair.Key].Add(Button);
+							}
+						}
+					}
+
+					JToken OutputListToken = Configs.GetValue("OutputList");
+					JObject OutputList = OutputListToken.ToObject<JObject>();
+					{
+						foreach (var Pair in OutputList)
+						{
+							_addresses.Add(Pair.Key, Convert.ToInt32(Pair.Value.ToString(), 16));
+							_outputs.Add(Pair.Key, 0);
+
+							OutputLstBx.Items.Add(Pair.Key + " : " + Pair.Value);
 						}
 					}
 				}
 
-				JToken OutputListToken = Configs.GetValue("OutputList");
-				JObject OutputList = OutputListToken.ToObject<JObject>();
-				{
-					foreach(var Pair in OutputList)
-					{
-						_addresses.Add(Pair.Key, Convert.ToInt32(Pair.Value.ToString(), 16));
-						_outputs.Add(Pair.Key, 0);
-
-						LB_Output.Items.Add(Pair.Key);
-					}
-				}
+				RunBtn.Enabled = true;
 			}
 		}
 
@@ -101,7 +113,6 @@ namespace BizHawk.Client.EmuHawk
 		private Socket _socket;
 		private IPEndPoint _endPoint;
 		private byte[] _packet = new byte[1024];
-		private int _packetSize = 0;
 
 		private Dictionary<string, int> _buttons = new Dictionary<string, int>();
 		private Dictionary<string, List<string>> _maps = new Dictionary<string, List<string>>();
@@ -116,11 +127,17 @@ namespace BizHawk.Client.EmuHawk
 			_socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			_endPoint = new IPEndPoint(ip, port);
 			_socket.Connect(_endPoint);
+
+			TB_IP.Enabled = false;
+			TB_Port.Enabled = false;
 		}
 
 		private void DisconnectServer()
 		{
 			_socket.Close();
+
+			TB_IP.Enabled = true;
+			TB_Port.Enabled = true;
 		}
 
 		private void ReadMemory()
@@ -133,7 +150,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void MakePacket()
 		{
-			Array.Clear(_packet, 0, _packetSize);
+			Array.Clear(_packet, 0, _packet.Length);
 
 			Dictionary<string, int> data = new Dictionary<string, int>();
 			foreach (var Pair in _outputs)
@@ -152,10 +169,10 @@ namespace BizHawk.Client.EmuHawk
 
 		private void ReceiveAction()
 		{
-			Array.Clear(_packet, 0, _packetSize);
+			Array.Clear(_packet, 0, _packet.Length);
 
-			_packetSize = _socket.Receive(_packet);
-			string data = Encoding.UTF8.GetString(_packet, 0, _packetSize);
+			int PacketSize = _socket.Receive(_packet);
+			string data = Encoding.UTF8.GetString(_packet, 0, PacketSize);
 			var keys = JsonConvert.DeserializeObject<Dictionary<string, int>>(data);
 
 			foreach(var Pair in _buttons.ToList())
@@ -173,7 +190,7 @@ namespace BizHawk.Client.EmuHawk
 
 		private void PrintPacket()
 		{
-			Console.WriteLine(Encoding.UTF8.GetString(_packet, 0, _packetSize));
+			Console.WriteLine(Encoding.UTF8.GetString(_packet, 0, _packet.Length));
 		}
 
 		#endregion
@@ -204,7 +221,6 @@ namespace BizHawk.Client.EmuHawk
 			set
 			{
 				_frames = value;
-				FramesLabel.Text = _frames.ToString();
 			}
 		}
 
@@ -461,6 +477,11 @@ namespace BizHawk.Client.EmuHawk
 		private void SetNormalSpeed()
 		{
 			GlobalWin.MainForm.Throttle();
+		}
+
+		private void LoadConfigBtn_Click(object sender, EventArgs e)
+		{
+			this.LoadConfig();
 		}
 	}
 }
