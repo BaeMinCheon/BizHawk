@@ -274,18 +274,25 @@ namespace BizHawk.Client.EmuHawk
 		{
 			if(_isBotting)
 			{
-				this.ReadMemory();
+				try
+				{
+					this.ReadMemory();
 
-				GlobalWin.MainForm.PauseEmulator();
+					GlobalWin.MainForm.PauseEmulator();
 
-				this.ReceiveAction();
-				this.MakePacket();
-				this.SendPacket();
-				this.PrintPacket();
+					this.ReceiveAction();
+					this.MakePacket();
+					this.SendPacket();
+					this.PrintPacket();
 
-				GlobalWin.MainForm.UnpauseEmulator();
+					GlobalWin.MainForm.UnpauseEmulator();
 
-				this.PressButtons();
+					this.PressButtons();
+				}
+				catch
+				{
+					this.StopBot();
+				}
 			}
 		}
 
