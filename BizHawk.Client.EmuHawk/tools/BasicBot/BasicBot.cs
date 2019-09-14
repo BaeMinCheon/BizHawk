@@ -319,7 +319,7 @@ namespace BizHawk.Client.EmuHawk
 			{
 				_currentDomain = _MemoryDomains.MainMemory;
 				_isBigEndian = _currentDomain.EndianType == MemoryDomain.Endian.Big;
-				_dataSize = 1;
+				_dataSize = 2;
 			}
 
 			if (_isBotting)
@@ -383,12 +383,26 @@ namespace BizHawk.Client.EmuHawk
 
 		private void RunBtn_Click(object sender, EventArgs e)
 		{
-			StartBot();
+			try
+			{
+				this.StartBot();
+			}
+			catch
+			{
+				this.StopBot();
+			}
 		}
 
 		private void StopBtn_Click(object sender, EventArgs e)
 		{
-			StopBot();
+			try
+			{
+				this.StopBot();
+			}
+			catch
+			{
+				this.Close();
+			}
 		}
 
 		private void ClearStatsContextMenuItem_Click(object sender, EventArgs e)
@@ -474,6 +488,7 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.MainForm.PauseEmulator();
 
 			this.DisconnectServer();
+			this.Close();
 		}
 
 		private void SetMaxSpeed()
