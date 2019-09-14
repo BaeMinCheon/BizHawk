@@ -278,14 +278,10 @@ namespace BizHawk.Client.EmuHawk
 				{
 					this.ReadMemory();
 
-					GlobalWin.MainForm.PauseEmulator();
-
 					this.ReceiveAction();
 					this.MakePacket();
 					this.SendPacket();
 					this.PrintPacket();
-
-					GlobalWin.MainForm.UnpauseEmulator();
 
 					this.PressButtons();
 				}
