@@ -32,7 +32,6 @@
 		"P2.Position.Y.Raw" : "0x000E0A",
 		"P2.HP.Current" : "0x000F12",
 		"RoundTimer" : "0x001AC8",
-		"Winner.Player.Raw" : "0x001ACE",
-		"IsPlayingRound.Raw" : "0x0000DE"
+		"Winner.Player.Raw" : "0x001ACE"
 	}
 }
