@@ -484,7 +484,6 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.MainForm.PauseEmulator();
 
 			this.DisconnectServer();
-			this.Close();
 		}
 
 		private void SetMaxSpeed()
