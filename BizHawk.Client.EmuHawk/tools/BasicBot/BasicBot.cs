@@ -460,6 +460,7 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.MainForm.UnpauseEmulator();
 
 			this.ConnectServer();
+			this.Close();
 		}
 
 		private bool CanStart()
