@@ -460,7 +460,6 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.MainForm.UnpauseEmulator();
 
 			this.ConnectServer();
-			this.Close();
 		}
 
 		private bool CanStart()
@@ -485,6 +484,7 @@ namespace BizHawk.Client.EmuHawk
 			GlobalWin.MainForm.PauseEmulator();
 
 			this.DisconnectServer();
+			this.Close();
 		}
 
 		private void SetMaxSpeed()
